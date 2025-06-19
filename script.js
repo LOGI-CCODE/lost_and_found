@@ -1,85 +1,135 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 🟣 Toggle tabs between Found and Lost
+  // 🌐 Tab switching
   document.getElementById('found-tab').addEventListener('click', () => {
-    document.getElementById('found-form').classList.remove('hidden');
-    document.getElementById('lost-form').classList.add('hidden');
-    document.getElementById('found-tab').classList.add('active');
-    document.getElementById('lost-tab').classList.remove('active');
+    showSection('found-form', 'found-tab');
   });
 
   document.getElementById('lost-tab').addEventListener('click', () => {
-    document.getElementById('lost-form').classList.remove('hidden');
-    document.getElementById('found-form').classList.add('hidden');
-    document.getElementById('lost-tab').classList.add('active');
-    document.getElementById('found-tab').classList.remove('active');
+    showSection('lost-form', 'lost-tab');
   });
 
-  // 🟢 Found item form submit
+  document.getElementById('login-tab').addEventListener('click', () => {
+    showSection('login-section', 'login-tab');
+  });
+
+  function showSection(sectionId, tabId) {
+    document.querySelectorAll('.form-section').forEach(s => s.classList.add('hidden'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(sectionId).classList.remove('hidden');
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  // 🟢 Found form submission
   document.getElementById('foundItemForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const token = grecaptcha.getResponse();
     if (!token) return alert("Please complete the reCAPTCHA.");
 
     const payload = {
-      email: document.getElementById('foundEmail').value,
-      item_name: document.getElementById('foundName').value,
-      color: document.getElementById('foundColor').value,
-      brand: document.getElementById('foundBrand').value,
-      location: document.getElementById('foundLocation').value,
+      email: foundEmail.value,
+      item_name: foundName.value,
+      color: foundColor.value,
+      brand: foundBrand.value,
+      location: foundLocation.value,
       captchaToken: token
     };
 
-    try {
-      const res = await fetch('https://backend-by4w.onrender.com/api/found', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+    const res = await fetch('https://backend-by4w.onrender.com/api/found', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
 
-      const data = await res.json();
-      alert(data.message || 'Item registered!');
-      grecaptcha.reset();
-      document.getElementById('foundItemForm').reset();
-    } catch (err) {
-      alert('Error registering item.');
-      console.error(err);
-    }
+    const data = await res.json();
+    alert(data.message || 'Item registered!');
+    grecaptcha.reset();
+    foundItemForm.reset();
   });
 
-  // 🔍 Lost item search form submit
+  // 🔍 Lost form submission
   document.getElementById('lostItemForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const token = grecaptcha.getResponse();
     if (!token) return alert("Please complete the reCAPTCHA.");
 
     const payload = {
-      item_name: document.getElementById('lostName').value,
-      color: document.getElementById('lostColor').value,
-      brand: document.getElementById('lostBrand').value,
+      item_name: lostName.value,
+      color: lostColor.value,
+      brand: lostBrand.value,
       captchaToken: token
     };
 
-    try {
-      const res = await fetch('https://backend-by4w.onrender.com/api/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+    const res = await fetch('https://backend-by4w.onrender.com/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
 
-      const results = await res.json();
+    const results = await res.json();
 
-      const output = results.length
-        ? results.map(item => `<li>${item.item_name} (${item.color}) - ${item.brand || 'No brand'} at ${item.location}</li>`).join('')
-        : '<p>No items found matching your criteria.</p>';
+    const output = results.length
+      ? results.map(item => `<li>${item.item_name} (${item.color}) - ${item.brand || 'No brand'} at ${item.location}</li>`).join('')
+      : '<p>No items found matching your criteria.</p>';
 
-      document.getElementById('searchResults').innerHTML = `<ul>${output}</ul>`;
-      grecaptcha.reset();
-      document.getElementById('lostItemForm').reset();
-    } catch (err) {
-      alert('Error searching for items.');
-      console.error(err);
+    document.getElementById('searchResults').innerHTML = `<ul>${output}</ul>`;
+    grecaptcha.reset();
+    lostItemForm.reset();
+  });
+
+  // 🔐 Login form
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = grecaptcha.getResponse();
+    if (!token) return alert("Please complete the reCAPTCHA.");
+
+    const payload = {
+      email: loginEmail.value,
+      password: loginPassword.value,
+      captchaToken: token
+    };
+
+    const res = await fetch('https://backend-by4w.onrender.com/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert("OTP sent to your email!");
+      showSection('otp-section', 'login-tab');
+    } else {
+      alert(data.message || 'Login failed.');
     }
+    grecaptcha.reset();
+  });
+
+  // ✅ Verify OTP
+  document.getElementById('otpForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = grecaptcha.getResponse();
+    if (!token) return alert("Please complete the reCAPTCHA.");
+
+    const payload = {
+      email: loginEmail.value,
+      code: otpCode.value,
+      captchaToken: token
+    };
+
+    const res = await fetch('https://backend-by4w.onrender.com/api/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert("✅ Login successful!");
+      otpForm.reset();
+      showSection('found-form', 'found-tab'); // back to main
+    } else {
+      alert(data.message || 'Invalid OTP.');
+    }
+    grecaptcha.reset();
   });
 });
