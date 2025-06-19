@@ -7,8 +7,6 @@
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Load reCAPTCHA only once -->
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
@@ -18,8 +16,10 @@
     <div class="tabs">
       <button id="found-tab" class="tab active"><i class="fas fa-box-open"></i> I Found an Item</button>
       <button id="lost-tab" class="tab"><i class="fas fa-search"></i> I Lost an Item</button>
+      <button id="login-tab" class="tab"><i class="fas fa-sign-in-alt"></i> Login</button>
     </div>
 
+    <!-- Found Form -->
     <section id="found-form" class="form-section">
       <h2><i class="fas fa-box fa-beat-fade"></i> Found Item Details</h2>
       <form id="foundItemForm">
@@ -28,13 +28,12 @@
         <input type="text" id="foundColor" placeholder="Color" required />
         <input type="text" id="foundBrand" placeholder="Brand (Optional)" />
         <input type="text" id="foundLocation" placeholder="Found Location" required />
-
         <div class="g-recaptcha" data-sitekey="6Lfy62UrAAAAAGlhJ_hgRwmoscUi2-NgS-rY5rmn"></div>
-
         <button type="submit">Register Item</button>
       </form>
     </section>
 
+    <!-- Lost Form -->
     <section id="lost-form" class="form-section hidden">
       <h2><i class="fas fa-search-minus fa-spin-pulse"></i> Search Lost Item</h2>
       <form id="lostItemForm">
@@ -42,16 +41,34 @@
         <input type="text" id="lostName" placeholder="Item Name" required />
         <input type="text" id="lostColor" placeholder="Color (Optional)" />
         <input type="text" id="lostBrand" placeholder="Brand (Optional)" />
-
         <div class="g-recaptcha" data-sitekey="6Lfy62UrAAAAAGlhJ_hgRwmoscUi2-NgS-rY5rmn"></div>
-
         <button type="submit">Search</button>
       </form>
       <div id="searchResults"></div>
     </section>
+
+    <!-- Login Section -->
+    <section id="login-section" class="form-section hidden">
+      <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Your Email" required />
+        <input type="password" id="loginPassword" placeholder="Password" required />
+        <div class="g-recaptcha" data-sitekey="6Lfy62UrAAAAAGlhJ_hgRwmoscUi2-NgS-rY5rmn"></div>
+        <button type="submit">Send OTP</button>
+      </form>
+    </section>
+
+    <!-- OTP Verification Section -->
+    <section id="otp-section" class="form-section hidden">
+      <h2><i class="fas fa-key"></i> Enter OTP</h2>
+      <form id="otpForm">
+        <input type="text" id="otpCode" placeholder="6-digit OTP" maxlength="6" required />
+        <div class="g-recaptcha" data-sitekey="6Lfy62UrAAAAAGlhJ_hgRwmoscUi2-NgS-rY5rmn"></div>
+        <button type="submit">Verify OTP</button>
+      </form>
+    </section>
   </div>
 
-  <!-- Your JavaScript logic (below) will handle submission -->
   <script src="script.js"></script>
 </body>
 </html>
